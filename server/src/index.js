@@ -3,7 +3,7 @@ import { connectDB } from "./config/index.db.js";
 import userRoute from "./routes/user.routes.js"
 import chatRoute from "./routes/chat.routes.js"
 import cookieParser from "cookie-parser";
-
+import { server } from "./socket/index.js";
 
 const app = e()
 const PORT = process.env.PORT || 8000
@@ -18,6 +18,12 @@ app.use("/api/v1/chat", chatRoute) // http://localhost:8000/api/v1/user/registra
 connectDB().then(() => {
     app.listen(PORT, () => {
         console.log(`Server running on ${PORT}`)
+    })
+
+    initSocket();
+    
+    server.listen(5000, () => {
+        console.log("Socket Server running on PORT 5000")
     })
 }).catch((err) => {
     console.log(`ERR: ${err}`)
