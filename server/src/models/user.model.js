@@ -47,7 +47,7 @@ userSchema.methods.generateAccessToken = function () {
         },
         process.env.ACCESS_TOKEN_KEY,
         {
-            expiresIn: '10m',
+            expiresIn: '20m',
             algorithm: 'HS256',
         }
     )

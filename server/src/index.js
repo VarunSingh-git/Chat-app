@@ -4,6 +4,7 @@ import userRoute from "./routes/user.routes.js"
 import chatRoute from "./routes/chat.routes.js"
 import cookieParser from "cookie-parser";
 import { server } from "./socket/index.js";
+import { initSocket } from "./socket/index.js";
 
 const app = e()
 const PORT = process.env.PORT || 8000

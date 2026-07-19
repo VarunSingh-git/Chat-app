@@ -16,11 +16,11 @@ rl.question("Enter your userId: ", (senderId) => {
 
         console.log("Joined chat. Type your message and press enter:");
 
-        rl.on("line", (msg) => {
+        rl.on("line", (message) => {
             socket.emit("send_message", {
                 chatId,
                 senderId,
-                message: msg,
+                message: message,
             }); // 2nd emit — every line typed
         });
     });

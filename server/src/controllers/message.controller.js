@@ -1,30 +1,31 @@
 import { io } from "../socket/index.js";
-import { Chat } from "../models/chat.model";
-import { Message } from "../models/message.model";
+import { Chat } from "../models/chat.model.js";
+import { Message } from "../models/message.model.js";
 
-const handleSendMessage = async ({ chatId, senderId, message }) => {
+const handleSendMessage = async (chatId, senderId, message ) => {
+  if (!chatId || !senderId || !message) {
+    return false
+  }
+  const messageCreated = await Message.create({
+    chatId,
+    senderId,
+    message,
+  });
+console.log("messageCreated",messageCreated);
 
-    if (!chatId || !senderId || !message) {
-        return res.status(400).json({ message: "ChatId, senderId and message is required" })
-    }
-    const messageCreated = await Message.create({
-        chatId,
-        senderId,
-        message
-    })
+  if (!messageCreated._id) return false
 
-    if (!messageCreated._id) return res.status(500).json({ message: "Message couldn't create" })
+  const chatUpdated = await Chat.findByIdAndUpdate(chatId, {
+    $set: {
+      lastMessage: messageCreated?._id,
+    },
+  });
 
-    const chatUpdated = await Chat.findByIdAndUpdate(chatId, {
-        $set: {
-            lastMessage: message
-        }
-    })
+  if (!chatUpdated)
+    return false
+  io.to(chatId).emit("receive_message", messageCreated);
 
-    if (!chatUpdated) return res.status(400).json({ message: "last message is not update. try again" })
-    io.to(chatId).emit("receive_message", messageCreated)
+  return messageCreated;
+};
 
-    return messageCreated
-}
-
-export { handleSendMessage }
+export { handleSendMessage };
