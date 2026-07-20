@@ -25,4 +25,16 @@ const chat = asyncHandler(async (req, res) => {
     return res.status(200).json({ message: "Chat created successfully", chat })
 })
 
-export { chat }
+
+const getUserChats = async (req, res) => {
+  const userId = req.user?._id; // from your auth middleware
+
+  const chats = await Chat.find({ participants: userId })
+    .populate("participants", "username")
+    .populate("lastMessage")
+    .sort({ updatedAt: -1 });
+
+  return res.status(200).json(chats);
+};
+
+export { chat, getUserChats };

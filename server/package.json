@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "node --watch --env-file=.env src/index.js",
-    "socket":"node src/socket/index.js"
+    "socket": "node src/socket/index.js"
   },
   "peerDependencies": {
     "typescript": "^5"

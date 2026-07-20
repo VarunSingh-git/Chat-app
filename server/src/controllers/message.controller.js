@@ -1,31 +1,40 @@
-import { io } from "../socket/index.js";
 import { Chat } from "../models/chat.model.js";
 import { Message } from "../models/message.model.js";
+import { createMessage } from "../services/message.services.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 
-const handleSendMessage = async (chatId, senderId, message ) => {
-  if (!chatId || !senderId || !message) {
-    return false
-  }
-  const messageCreated = await Message.create({
-    chatId,
-    senderId,
-    message,
-  });
-console.log("messageCreated",messageCreated);
+// used by socket/index.js on "send_message" event
+const handleSendMessage = asyncHandler(async (io, chatId, senderId, message) => {
+  const populatedData = await createMessage(io, chatId, senderId, message)
+  if (!populatedData) return false
 
-  if (!messageCreated._id) return false
+  io.to(chatId).emit("receive_message", populatedData);
+  return populatedData;
+})
 
-  const chatUpdated = await Chat.findByIdAndUpdate(chatId, {
-    $set: {
-      lastMessage: messageCreated?._id,
-    },
-  });
+const sendMessageController = asyncHandler(async (req, res) => {
+  const { chatId } = req.params;
+  const { message } = req.body;
+  const { senderId } = req.user?._id
 
-  if (!chatUpdated)
-    return false
-  io.to(chatId).emit("receive_message", messageCreated);
+  const populatedMessage = await createMessage(chatId, message, senderId)
+  if (!populatedMessage) return res.status(400).json({ message: "Failed to send message" })
 
-  return messageCreated;
-};
+  return res.status(201).json(populatedMessage)
+})
 
-export { handleSendMessage };
+const getMessageController = asyncHandler(async () => {
+  const { chatId } = req.params;
+  const { page = 1, limit = 30 } = req.query;
+
+  const messages = await Message.find({ chatId })
+    .populate("senderId", "username")
+    .sort({ createdAt: -1 }) // newest first
+    .skip((page - 1) * limit)
+    .limit(Number(limit));
+
+  return res.status(200).json(messages.reverse()); // reverse so oldest-to-newest for UI
+})
+
+
+export { handleSendMessage, sendMessageController, getMessageController };

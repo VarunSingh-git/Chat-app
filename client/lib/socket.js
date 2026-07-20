@@ -1,36 +1,21 @@
-import { io } from "socket.io-client";
-import readline from "node:readline"
+"use client"
 
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-})
+import { io } from "socket.io-client"
 
-const socket = io("http://localhost:5000")
+let socket;
 
-console.log("Connected to socket server");
+export const getSocket = (accessToken) => {
+    if (!socket) {
+        socket = io(process.env.NEXT_PUBLIC_API_URL, {
+            auth: {
+                token: accessToken,
+            },
+            autoConnect: false
 
-rl.question("Enter your userId: ", (senderId) => {
-    rl.question("Enter chatId to join: ", (chatId) => {
-        socket.emit("join_chat", chatId); // 1st emit — join the room
-
-        console.log("Joined chat. Type your message and press enter:");
-
-        rl.on("line", (message) => {
-            socket.emit("send_message", {
-                chatId,
-                senderId,
-                message: message,
-            }); // 2nd emit — every line typed
-        });
-    });
-});
-
-
-socket.on("receive_message", (data) => {
-    console.log(`\n[${data.senderId}]: ${data.message}`);
-});
-
-socket.on("disconnect", () => {
-    console.log("Disconnected from server");
-})
+        })
+    }
+    else {
+        socket.auth.token = accessToken
+    }
+    return socket
+}

@@ -5,9 +5,15 @@ import chatRoute from "./routes/chat.routes.js"
 import cookieParser from "cookie-parser";
 import { server } from "./socket/index.js";
 import { initSocket } from "./socket/index.js";
+import cors from "cors"
 
 const app = e()
 const PORT = process.env.PORT || 8000
+
+app.use(cors({
+    origin: process.env.CLIENT_URL, // e.g. "http://localhost:3000"
+    credentials: true, // required so the browser sends/receives your refreshToken cookie
+}))
 
 app.use(cookieParser())
 app.use(e.json())
@@ -22,7 +28,7 @@ connectDB().then(() => {
     })
 
     initSocket();
-    
+
     server.listen(5000, () => {
         console.log("Socket Server running on PORT 5000")
     })
