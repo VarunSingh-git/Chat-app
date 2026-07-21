@@ -6,7 +6,7 @@ let socket;
 
 export const getSocket = (accessToken) => {
     if (!socket) {
-        socket = io(process.env.NEXT_PUBLIC_API_URL, {
+        socket = io(process.env.NEXT_PUBLIC_SOCKET_URL, {
             auth: {
                 token: accessToken,
             },

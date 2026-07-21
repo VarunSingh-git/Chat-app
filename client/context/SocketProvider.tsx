@@ -20,7 +20,10 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
         s.connect();
         setSocket(s)
 
-        return () => s.disconnect()
+        return () => {
+            s.removeAllListeners();
+            s.disconnect() 
+        }
     }, [isAuthenticated, accessToken])
 
     return <SocketContext.Provider value={socket}>{children}</SocketContext.Provider>

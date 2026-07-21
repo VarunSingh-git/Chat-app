@@ -27,13 +27,14 @@ export default function ChatsPage() {
             router.push("/login");
             return;
         }
+        console.log(isAuthenticated, accessToken)
+
         axiosInstance
-            .get<ChatItem[]>("/chat/chats", {
+            .get<ChatItem[]>("/chat", {
                 headers: { Authorization: `Bearer ${accessToken}` },
             })
             .then((res) => setChats(res.data));
     }, [isAuthenticated, accessToken]);
-
     return (
         <div className="max-w-md mx-auto mt-8 px-4">
             <div className="flex justify-between items-center mb-4">

@@ -29,9 +29,10 @@ export default function ChatRoom() {
     // Step A: load old messages once, via REST
     useEffect(() => {
         if (!chatId || !accessToken) return;
+        console.log(chatId, accessToken);
 
         axiosInstance
-            .get<Message[]>(`/chats/${chatId}/messages`, {
+            .get<Message[]>(`chat/chats/${chatId}/messages`, {
                 headers: { Authorization: `Bearer ${accessToken}` },
             })
             .then((res) => setMessages(res.data));

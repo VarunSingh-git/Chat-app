@@ -15,7 +15,7 @@ const handleSendMessage = asyncHandler(async (io, chatId, senderId, message) => 
 const sendMessageController = asyncHandler(async (req, res) => {
   const { chatId } = req.params;
   const { message } = req.body;
-  const { senderId } = req.user?._id
+  const senderId = req.user?._id
 
   const populatedMessage = await createMessage(chatId, message, senderId)
   if (!populatedMessage) return res.status(400).json({ message: "Failed to send message" })
@@ -23,7 +23,7 @@ const sendMessageController = asyncHandler(async (req, res) => {
   return res.status(201).json(populatedMessage)
 })
 
-const getMessageController = asyncHandler(async () => {
+const getMessageController = asyncHandler(async (req, res) => {
   const { chatId } = req.params;
   const { page = 1, limit = 30 } = req.query;
 
